@@ -1,23 +1,19 @@
 from flask import Flask, request
+from flask.json import jsonify
 
 app = Flask(__name__)
 
-from flask.json import jsonify
-
+user_service = UserService(FileDbService)
 
 
 @app.route('/api/v1/users')
 def get_user_list():
-    return jsonify([
-      {'username' : 'zaki'},
-      {'username' : 'nube'}
-      ])
+    return jsonify(user_service.get_list())
 
 @app.route('/api/v1/users', methods=['POST'])
 def create_user():
-    #user = UserService.create(user_data)
-user = {'username' : 'zaki'}
-return jsonify(user)
+    user = UserService.create(user_data)
+    return jsonify(user)
 
 @app.route('/api/v1/users', methods=['PUT'])
 def update_user():

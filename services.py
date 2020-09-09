@@ -1,62 +1,62 @@
 import json
 import uuid
-from abc import abstrastclass, ABC
+from abc import abstractmethod, ABC
 from models import User
 
 class DbService(ABC):
-    @abstrastclass
+    @abstractmethod
     def get_list(): pass
 
-    @abstrastclass
+    @abstractmethod
     def retrieve(self, user_id): pass
 
-    @abstrastclass
+    @abstractmethod
     def create(self, data): pass
 
-    @abstrastclass
+    @abstractmethod
     def update(self, user_id, data): pass
 
-    @abstrastclass
+    @abstractmethod
     def delete(self, user_id): pass
 
 class FileDbService(DbService):
-    def __init__(self, resource_name: str, filename: str):
+    def __init__(self, resource_name: str, filename: str = 'mydb'):
         self.filename = filename
 
     def get_list(self):
-        with open(filename, 'r') as mydb:
+        with open(self.filename, 'r') as mydb:
             tables = json.loads(mydb.read())
             return tables[self.resource_name]
 
     def retrieve(self, user_id):
-        with open(filename, 'r') as mydb:
+        with open(self.filename, 'r') as mydb:
             tables = json.loads(mydb.read())
             return tables[self.resource_name][user_id]
 
     def create(self, data):
-        with open(filename, 'r') as mydb:
+        with open(self.filename, 'r') as mydb:
             tables = json.loads(mydb.read())
             tables_changed = tables.copy()
             nwid = str(uuid.uuid4())
             data['id'] = newid
             tables_changed['users'][newid] = data
-        with open(filename, 'w') as mydb:
+        with open(self.filename, 'w') as mydb:
             mydb.write(tables_changed)
 
     def update(self, user_id, data):
-        with open(filename, 'r') as mydb:
+        with open(self.filename, 'r') as mydb:
             tables = json.loads(mydb.read())
             tables_changed = tables.copy()
             tables_changed['users'][newid] = data
-        with open(filename, 'w') as mydb:
+        with open(self.filename, 'w') as mydb:
             mydb.write(tables_changed)
 
     def delete(self, user_id):
-        with open(filename, 'r') as mydb:
+        with open(self.filename, 'r') as mydb:
             tables = json.loads(mydb.read())
             tables_changed = tables.copy()
             del tables_changed['users']
-        with open(filename, 'w') as mydb:
+        with open(self.filename, 'w') as mydb:
             mydb.write(tables_changed)
 
 
@@ -65,7 +65,7 @@ class UserService:
   RESOURCE_NAME = 'users'
 
     def __init__(self, db:DbService):
-        self.db = db(RESOURCE_NAME)
+        self.db = db(self.RESOURCE_NAME)
 
     def get_list(self):
         return self.db.get_list()
